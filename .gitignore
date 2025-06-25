@@ -1,0 +1,57 @@
+# =================
+# LAMMPS
+# =================
+log.lammps
+log.*
+*.dump
+*.dump.bin
+*.restart
+*.lammpstrj
+tmp.*
+screen
+*.out
+*.log
+
+# =================
+# VMD
+# =================
+# VMD state files (optional, can be useful to keep)
+*.vmd
+# Rendered movies if they are large
+*.mp4
+*.mov
+*.mpg
+*.avi
+
+# =================
+# MATLAB
+# =================
+*.asv
+*.bak
+*.mex*
+*.p
+*.log
+pathdef.m
+
+# =================
+# LaTeX
+# =================
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+_build/
+
+# =================
+# OS Generated files
+# =================
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
