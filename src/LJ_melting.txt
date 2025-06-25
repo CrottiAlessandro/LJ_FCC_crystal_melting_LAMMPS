@@ -1,0 +1,74 @@
+# MELTING OF AN FCC LENNARD-JONES CRYSTAL (BULK, NPT)
+
+units           lj
+atom_style      atomic
+boundary        p p p            # fully periodic
+
+# Build FCC crystal
+lattice         fcc 1.122
+region          box block 0 10 0 10 0 10 units lattice   # 10×10×10 unit cells
+create_box      1 box
+create_atoms    1 box
+mass            1 1.0
+
+# Initial velocities
+velocity        all create 0.3 581277 mom yes rot no dist gaussian
+
+# LJ potential 
+pair_style      lj/cut 2.5
+pair_modify     shift yes
+pair_coeff      1 1 1.0 1.0 2.5
+
+neighbor        0.3 bin
+neigh_modify    every 1 delay 0 check yes
+
+# MD parameters & output 
+timestep        0.005
+thermo          100
+thermo_style    custom step time temp press pe ke etotal lx ly lz
+
+dump            traj all atom 100 dump_npt.lammpstrj
+dump_modify     traj sort id
+
+
+# ANALISI : densità, MSD, RDF, Q6
+
+
+# temperatura istantanea
+variable  T equal temp
+fix       fT     all ave/time 100 1 1000 v_T         file Temp.dat
+
+# densità
+variable        rho equal density
+fix             avr_rho all ave/time 100 1 1000 v_rho       file Density.dat
+
+# mean-squared displacement
+compute         msd all msd
+fix             avr_msd all ave/time 100 1 1000 c_msd[4]    file MSD.dat
+
+# RDF (200 bin fino al cutoff di 2.5)
+compute         gr all rdf 200
+fix             avr_gr all ave/time 100 1 1000 c_gr[*]      file RDF.dat mode vector
+
+
+
+# 1) Low-T equilibration  (T = 0.3, P = 0)
+fix             npt1 all npt temp 0.3 0.3 5.0  iso 0.0 0.0 50.0
+run             50000
+unfix           npt1
+
+
+# 2) Linear heating 0.3 -> 2.0  (50 000 steps)
+fix             npt_h all npt temp 0.3 2.0 5.0  iso 0.0 0.0 50.0
+run             80000
+unfix           npt_h
+
+
+# 3) High-T hold  (T = 2.0)
+fix             npt2 all npt temp 2.0 2.0 5.0  iso 0.0 0.0 50.0
+run             50000
+unfix           npt2
+
+# save final configuration 
+write_dump 	all custom final.dump id type x y z
+write_data      fin_npt.dat
