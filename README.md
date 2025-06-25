@@ -1,0 +1,1 @@
+# LJ_FCC_crystal_melting_LAMMPS
